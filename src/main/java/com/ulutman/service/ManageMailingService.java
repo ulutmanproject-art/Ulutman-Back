@@ -2,6 +2,7 @@ package com.ulutman.service;
 
 import com.ulutman.exception.NotFoundException;
 import com.ulutman.mapper.MailingMapper;
+import com.ulutman.model.dto.MailingRequest;
 import com.ulutman.model.dto.MailingResponse;
 import com.ulutman.model.dto.UserMailingResponse;
 import com.ulutman.model.entities.Mailing;
@@ -35,18 +36,34 @@ public class ManageMailingService {
     private final MailingService mailingService;
     private final UserRepository userRepository;
 
-    public void sendMailingToAllUsers(Long mailingId) {
-        List<User> users = userRepository.findAll();
-        System.out.println("ВСЕ полльзователи " + users);
+    public MailingResponse createMailingAndSendToAll(
+            MailingRequest request
+    ) {
 
-        users.forEach(user -> {
+        MailingResponse response =
+                mailingService.createMailing(request);
+
+        List<User> users = userRepository.findAll();
+
+        for (User user : users) {
+
             try {
-                mailingService.sendMailing(mailingId, user.getEmail());
-            } catch (MessagingException e) {
-                System.err.println("Ошибка отправки письма пользователю: " + user.getEmail());
+
+                mailingService.sendMailing(
+                        response.getId(),
+                        user.getEmail()
+                );
+
+            } catch (Exception e) {
+
+                e.printStackTrace();
             }
-        });
+        }
+
+        return response;
+
     }
+
 
     public List<User> getAllUsersWithMailings() {
         return userRepository.findAllUsersWithMailings();
@@ -56,7 +73,7 @@ public class ManageMailingService {
         List<Mailing> mailings = mailingRepository.findAll();
 
         return mailings.stream()
-                .map(this::mapMailingToResponse) // Убедитесь, что метод доступен и возвращает MailingResponse
+                .map(this::mapMailingToResponse)
                 .collect(Collectors.toList());
     }
 
@@ -66,10 +83,10 @@ public class ManageMailingService {
         List<UserMailingResponse> recipients = Optional.ofNullable(mailing.getRecipients())
                 .orElse(Collections.emptyList())
                 .stream()
-                .map(mailingMapper::mapToUserMailingResponse) // Предполагается, что вы используете userMailingMapper
+                .map(mailingMapper::mapToUserMailingResponse)
                 .collect(Collectors.toList());
 
-        response.setRecipients(recipients); // Устанавливаем получателей
+        response.setRecipients(recipients);
 
         return response;
     }
