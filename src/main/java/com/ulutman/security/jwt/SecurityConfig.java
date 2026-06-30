@@ -67,8 +67,7 @@ public class SecurityConfig {
                                 .requestMatchers(
                                         "/",
                                         "/login", "/oauth2/**",
-                                        "/auth/google-login",
-                                        "/api/auth/**",
+                                        "/auth/**",
                                         "/swagger-ui/**",
                                         "/v3/api-docs/**",
                                         "/api/publishes/**",
@@ -76,7 +75,7 @@ public class SecurityConfig {
                                         "/api/users/messages",
                                         "/api/users/comments",
                                         "/api/users/complaints",
-                                        "/api/S3/upload",
+                                        "/api/upload",
                                         "/api/favorites/check",
                                         "/api/user-accounts/{userId}",
                                         "/api/main-page/**",
