@@ -1,8 +1,5 @@
 package com.ulutman.service;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthException;
-import com.google.firebase.auth.FirebaseToken;
 import com.ulutman.exception.IncorrectCodeException;
 import com.ulutman.exception.MailSendingException;
 import com.ulutman.exception.NotFoundException;
@@ -131,50 +128,7 @@ public class AuthService {
     }
 
     public AuthWithGoogleResponse registerUserWithGoogle(String token) {
-        FirebaseToken firebaseToken;
-        try {
-            firebaseToken = FirebaseAuth.getInstance().verifyIdToken(token);
-            log.info("FirebaseToken успешно проверен");
-        } catch (FirebaseAuthException firebaseAuthException) {
-            log.error("Во время аутентификации произошла ошибка", firebaseAuthException);
-            throw new BadCredentialsException("Во время аутентификации произошла ошибка");
-        }
-
-        String email = firebaseToken.getEmail();
-        User user = userRepository.findByEmail(email).orElseGet(() -> {
-
-            User newUser = new User();
-            String fullName = firebaseToken.getName();
-            int spaceIndex = fullName.indexOf(" ");
-            if (spaceIndex != -1) {
-                newUser.setName(fullName.substring(0, spaceIndex));
-                newUser.setLastName(fullName.substring(spaceIndex + 1));
-            } else {
-                newUser.setName(fullName);
-            }
-            newUser.setEmail(email);
-            newUser.setPassword(passwordEncoder.encode(firebaseToken.getEmail()));
-            newUser.setRole(Role.USER);
-            return userRepository.save(newUser);
-        });
-
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("role", user.getRole().name());
-        String userAccountToken = jwtUtil.createToken(claims, user.getEmail());
-
-        log.info("Аутентификация через Google завершена успешно, токен: {}", userAccountToken);
-
-        return AuthWithGoogleResponse.builder()
-                .userId(user.getId().toString())
-                .email(user.getEmail())
-                .name(user.getName() + " " + user.getLastName())
-                .picture(user.getPicture())
-                .locale(user.getLocale())
-                .role(user.getRole())
-                .status(user.getStatus())
-                .createDate(user.getCreateDate())
-                .token(userAccountToken)
-                .build();
+        throw new UnsupportedOperationException("Google auth не поддерживается");
     }
 
     public void sendPasswordResetCode(String email) throws EntityNotFoundException {
