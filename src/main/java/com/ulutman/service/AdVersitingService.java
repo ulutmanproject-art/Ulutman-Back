@@ -2,31 +2,30 @@ package com.ulutman.service;
 
 import com.ulutman.model.entities.AdVersiting;
 import com.ulutman.model.entities.User;
+import com.ulutman.model.enums.MediaFileType;
 import com.ulutman.repository.AdVersitingRepository;
 import com.ulutman.repository.UserRepository;
 import jakarta.mail.MessagingException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-
 
 import okhttp3.*;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 
+@Slf4j
 @Service
 public class AdVersitingService {
 
@@ -37,7 +36,7 @@ public class AdVersitingService {
     private final MailingService mailingService;
 
     @Autowired
-    private S3Service s3Service;
+    private MinioService minioService;
 
     @Autowired
     public AdVersitingService(AdVersitingRepository adVersitingRepository, UserRepository userRepository, MailingService mailingService) throws IOException {
@@ -80,34 +79,22 @@ public class AdVersitingService {
         }
 
         User user = userOptional.get();
+        String userId = String.valueOf(user.getId());
 
-        Path tempImagePath = Files.createTempFile("temp-image-", imageFile.getOriginalFilename());
-        Path tempReceiptPath = Files.createTempFile("temp-receipt-", paymentReceiptFile.getOriginalFilename());
+        String imageKey = minioService.upload(imageFile, MediaFileType.AD_IMAGE, userId);
+        String receiptKey = minioService.upload(paymentReceiptFile, MediaFileType.AD_RECEIPT, userId);
 
-        Files.write(tempImagePath, imageFile.getBytes());
-        Files.write(tempReceiptPath, paymentReceiptFile.getBytes());
+        AdVersiting ad = new AdVersiting(imageKey, true, receiptKey, bank, user);
+        ad.setCreatedAt(LocalDateTime.now());
+        ad.setActive(false);
+        adVersitingRepository.save(ad);
 
+        java.io.File tempReceipt = Files.createTempFile("receipt-", paymentReceiptFile.getOriginalFilename()).toFile();
+        paymentReceiptFile.transferTo(tempReceipt);
         try {
-            Map<String, Path> filesToUpload = Map.of(
-                    "ads/images/" + user.getId() + "/" + imageFile.getOriginalFilename(), tempImagePath,
-                    "ads/receipts/" + user.getId() + "/" + paymentReceiptFile.getOriginalFilename(), tempReceiptPath
-            );
-
-            List<String> fileUrls = s3Service.uploadFiles(filesToUpload);
-
-            String imageFilePath = fileUrls.get(0);
-            String receiptFilePath = fileUrls.get(1);
-
-            AdVersiting ad = new AdVersiting(imageFilePath, true, receiptFilePath, bank, user);
-            ad.setCreatedAt(LocalDateTime.now());
-            ad.setActive(false);
-            adVersitingRepository.save(ad);
-
-            File receiptFile = tempReceiptPath.toFile();
-            sendReceiptAsDocumentToTelegram(receiptFile, bank, ad);
+            sendReceiptAsDocumentToTelegram(tempReceipt, bank, ad);
         } finally {
-            Files.deleteIfExists(tempImagePath);
-            Files.deleteIfExists(tempReceiptPath);
+            tempReceipt.delete();
         }
     }
 

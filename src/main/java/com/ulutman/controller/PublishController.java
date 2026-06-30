@@ -5,8 +5,9 @@ import com.ulutman.model.dto.PublishRequest;
 import com.ulutman.model.dto.PublishResponse;
 import com.ulutman.model.enums.*;
 import com.ulutman.repository.BankCardRepository;
+import com.ulutman.model.enums.MediaFileType;
+import com.ulutman.service.MinioService;
 import com.ulutman.service.PublishService;
-import com.ulutman.service.S3Service;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -19,9 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.*;
 
@@ -37,7 +35,7 @@ public class PublishController {
     private final PublishService publishService;
     private final BankCardRepository bankCardRepository;
     private static final Logger logger = (Logger) LoggerFactory.getLogger(PublishController.class);
-    private final S3Service s3Service;
+    private final MinioService minioService;
 
     @Operation(summary = "Create a publication")
     @ApiResponse(responseCode = "201", description = "The publish created successfully")
@@ -65,31 +63,21 @@ public class PublishController {
         publishRequest.setPhoneNumber(phoneNumber);
 
 
-        String tempDir = System.getProperty("java.io.tmpdir");
-
         try {
-            Map<String, Path> filesMap = new HashMap<>();
+            List<String> imageUrls = new ArrayList<>();
             for (MultipartFile file : images) {
-                Path tempFile = Paths.get(tempDir, file.getOriginalFilename());
-                Files.write(tempFile, file.getBytes());
-                filesMap.put(file.getOriginalFilename(), tempFile);
+                String objectKey = minioService.upload(file, MediaFileType.PUBLISH_IMAGE, "general");
+                imageUrls.add(minioService.presign(objectKey));
             }
-
-            List<String> imageUrls = s3Service.uploadFiles(filesMap);
             publishRequest.setImages(imageUrls);
 
-
-            for (Path tempFile : filesMap.values()) {
-                Files.deleteIfExists(tempFile);
-            }
-
             if (paymentReceiptFile != null && !paymentReceiptFile.isEmpty()) {
-                publishRequest.setPaymentReceiptFile(Optional.of((MultipartFile) paymentReceiptFile)); // <- Используем исходный MultipartFile
+                publishRequest.setPaymentReceiptFile(Optional.of(paymentReceiptFile));
             } else {
                 publishRequest.setPaymentReceiptFile(Optional.empty());
             }
         } catch (Exception e) {
-            logger.error("Ошибка загрузки файлов в S3: {}", e.getMessage());
+            logger.error("Ошибка загрузки файлов в MinIO: {}", e.getMessage());
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
