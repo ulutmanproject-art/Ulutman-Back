@@ -75,7 +75,7 @@ public class SecurityConfig {
                                         "/api/users/messages",
                                         "/api/users/comments",
                                         "/api/users/complaints",
-                                        "/api/upload",
+                                        "/api/upload/**",
                                         "/api/favorites/check",
                                         "/api/user-accounts/{userId}",
                                         "/api/main-page/**",
