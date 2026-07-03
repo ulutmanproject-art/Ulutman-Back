@@ -127,13 +127,6 @@ public class PublishController {
         return publishService.findById(id, principal);
     }
 
-//    @Operation(summary = "Get a publication by id")
-//    @ApiResponse(responseCode = "201", description = "Publication found")
-//    @GetMapping("find/{id}")
-//    public PublishResponse findById(@PathVariable Long id) {
-//        return this.publishService.findById(id);
-//    }
-
     @Operation(summary = "Update a publication by id")
     @ApiResponse(responseCode = "201", description = "Updated  the publication  by id successfully")
     @PutMapping("/update/{id}")

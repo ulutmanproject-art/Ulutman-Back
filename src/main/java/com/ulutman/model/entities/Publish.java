@@ -43,7 +43,7 @@ public class Publish {
     @Enumerated(EnumType.STRING)
     private Metro metro;
 
-    private String metroStation; // Новое поле для форматированного названия
+    private String metroStation;
 
     private String address;
 
@@ -87,7 +87,7 @@ public class Publish {
 
     @ElementCollection
     @CollectionTable(name = "publish_images")
-    @Column(name = "image")
+    @Column(name = "image", length = 5000)
     private List<String> images;
 
     @Column(name = "create_date")

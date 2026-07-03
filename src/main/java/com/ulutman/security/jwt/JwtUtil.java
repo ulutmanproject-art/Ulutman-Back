@@ -23,9 +23,13 @@ public class JwtUtil {
     private final Long TOKEN_EXPIRATION = 24 * 7 * 60 * 60 * 1000L; // 7 days
 
     private Key getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-        return Keys.hmacShaKeyFor(keyBytes);
+        return Keys.hmacShaKeyFor(secretKey.getBytes());
     }
+
+//    private Key getSigningKey() {
+//        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+//        return Keys.hmacShaKeyFor(keyBytes);
+//    }
 
     public String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
