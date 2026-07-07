@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -88,6 +89,7 @@ public class Publish {
     @ElementCollection
     @CollectionTable(name = "publish_images")
     @Column(name = "image", length = 5000)
+    @BatchSize(size = 20)
     private List<String> images;
 
     @Column(name = "create_date")
@@ -111,12 +113,8 @@ public class Publish {
     @Column(name = "favorite_count")
     private Long favoriteCount = 0L;
 
-    @ManyToOne(
-            cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}
-    )
-    @JoinColumn(
-            name = "payment_id"
-    )
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @JoinColumn(name = "payment_id")
     private Payment payment;
 
     @JsonManagedReference
@@ -125,17 +123,17 @@ public class Publish {
 
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id",nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @JsonManagedReference
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "property_details_id",referencedColumnName = "id")
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "property_details_id", referencedColumnName = "id")
     private PropertyDetails propertyDetails;
 
     @JsonManagedReference
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "conditions_id",referencedColumnName = "id")
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "conditions_id", referencedColumnName = "id")
     private Conditions conditions;
 
     @OneToMany(mappedBy = "publish", cascade = CascadeType.REMOVE, orphanRemoval = true)

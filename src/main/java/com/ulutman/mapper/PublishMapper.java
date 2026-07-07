@@ -34,9 +34,8 @@ public class PublishMapper {
     private String saveImage(MultipartFile image) {
         return "/////path////to/////saved//////image//////"; // Верните фактический путь к сохраненному изображению
     }
-
     public PublishResponse mapToResponse(Publish publish) {
-        return PublishResponse.builder()
+        PublishResponse.PublishResponseBuilder builder = PublishResponse.builder()
                 .id(publish.getId())
                 .title(publish.getTitle())
                 .description(publish.getDescription())
@@ -50,16 +49,53 @@ public class PublishMapper {
                 .createDate(publish.getCreateDate())
                 .detailFavorite(publish.isDetailFavorite())
                 .categoryStatus(publish.getCategoryStatus())
-                .publishStatus(publish.getPublishStatus())
-                .user(mapUserToAuthResponse(publish.getUser()))
                 .active(publish.isActive())
-                .propertyDetails(publish.getPropertyDetails())
-                .conditions(publish.getConditions())
-                .accountId(publish.getUser().getUserAccount().getId())
-                .favoriteCount(publish.getFavoriteCount())
                 .metroStation(publish.getMetroStation())
-                .build();
+                .favoriteCount(publish.getFavoriteCount())
+                .nextBoostTime(publish.getNextBoostTime())
+                .timeToNextBoost(publish.getTimeToNextBoost());
+
+        if (publish.getUser() != null) {
+            builder.userId(publish.getUser().getId());
+            builder.userName(publish.getUser().getName());
+
+            if (publish.getUser().getUserAccount() != null) {
+                builder.accountId(publish.getUser().getUserAccount().getId());
+            }
+
+            if (publish.getUser().getPublishes() != null) {
+                builder.numberOfPublications(publish.getUser().getPublishes().size());
+            }
+        }
+
+        return builder.build();
     }
+//    public PublishResponse mapToResponse(Publish publish) {
+//        return PublishResponse.builder()
+//                .id(publish.getId())
+//                .title(publish.getTitle())
+//                .description(publish.getDescription())
+//                .category(publish.getCategory())
+//                .subcategory(publish.getSubCategory())
+//                .address(publish.getAddress())
+//                .phoneNumber(publish.getPhone())
+//                .images(publish.getImages())
+//                .price(publish.getPrice())
+//                .publishStatus(publish.getPublishStatus())
+//                .createDate(publish.getCreateDate())
+//                .detailFavorite(publish.isDetailFavorite())
+//                .categoryStatus(publish.getCategoryStatus())
+//                .publishStatus(publish.getPublishStatus())
+//                .user(mapUserToAuthResponse(publish.getUser()))
+//                .active(publish.isActive())
+//                .propertyDetails(publish.getPropertyDetails())
+//                .conditions(publish.getConditions())
+//                .accountId(publish.getUser().getUserAccount().getId())
+//                .favoriteCount(publish.getFavoriteCount())
+//                .metroStation(publish.getMetroStation())
+//                .build();
+//    }
+
 
     public PublishDetailsResponse mapToDetailsResponse(Publish publish) {
         User user = publish.getUser();

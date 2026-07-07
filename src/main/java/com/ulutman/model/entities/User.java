@@ -66,7 +66,7 @@ public class User implements UserDetails {
     private UserAccount userAccount;
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "user", cascade = CascadeType.PERSIST,fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<Publish> publishes = new ArrayList<>();
 
     @JsonManagedReference

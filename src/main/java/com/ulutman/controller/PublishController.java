@@ -15,6 +15,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +33,7 @@ import java.util.*;
 @RequestMapping("/api/publishes")
 @Tag(name = "Publish")
 @SecurityRequirement(name = "Authorization")
-@CrossOrigin(origins = "*",maxAge = 3600)
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class PublishController {
 
     private final PublishService publishService;
@@ -50,10 +54,9 @@ public class PublishController {
             @RequestParam("price") double price,
             @RequestParam("category") Category category,
             @RequestParam("subcategory") Subcategory subcategory,
-            @RequestParam(value = "bank", required = false) String bank, // Опционально
-            @RequestParam(value = "paymentReceiptFile", required = false) MultipartFile paymentReceiptFile, // Файл
+            @RequestParam(value = "bank", required = false) String bank,
+            @RequestParam(value = "paymentReceiptFile", required = false) MultipartFile paymentReceiptFile,
             @RequestParam("userId") Long userId) {
-
 
         PublishRequest publishRequest = new PublishRequest();
         publishRequest.setTitle(title);
@@ -61,7 +64,6 @@ public class PublishController {
         publishRequest.setMetro(metro);
         publishRequest.setAddress(address);
         publishRequest.setPhoneNumber(phoneNumber);
-
 
         try {
             List<String> imageUrls = new ArrayList<>();
@@ -88,7 +90,7 @@ public class PublishController {
         publishRequest.setUserId(userId);
 
         try {
-            PublishResponse response = publishService.createPublish(publishRequest); // Используем первый файл изображения
+            PublishResponse response = publishService.createPublish(publishRequest);
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
             logger.error("Ошибка в аргументах: {}", e.getMessage());
@@ -100,7 +102,7 @@ public class PublishController {
     }
 
     @Operation(summary = "Create a publication with details")
-    @ApiResponse(responseCode = "201", description = "The publish with details  created successfully")
+    @ApiResponse(responseCode = "201", description = "The publish with details created successfully")
     @PostMapping("/createDetails")
     public ResponseEntity<PublishResponse> createPublicationDetails(@RequestBody PublishRequest publishRequest) {
         try {
@@ -114,21 +116,31 @@ public class PublishController {
         }
     }
 
+    @Operation(summary = "Get all publications with pagination")
+    @ApiResponse(responseCode = "200", description = "Publications retrieved successfully")
     @GetMapping("/getAll")
-    public ResponseEntity<List<PublishResponse>> getAllPublishes(Principal principal) {
-        List<PublishResponse> publishes = publishService.getAll(principal);
+    public ResponseEntity<Page<PublishResponse>> getAllPublishes(
+            Principal principal,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "lastBoostedAt") String sortBy,
+            @RequestParam(defaultValue = "DESC") String sortDirection) {
+
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<PublishResponse> publishes = publishService.getAllWithPagination(principal, pageable);
         return ResponseEntity.ok(publishes);
     }
 
     @Operation(summary = "Get a publication by id")
     @ApiResponse(responseCode = "200", description = "Publication found")
-    @GetMapping("find/{id}")
+    @GetMapping("/find/{id}")
     public PublishResponse findById(@PathVariable Long id, Principal principal) {
         return publishService.findById(id, principal);
     }
 
     @Operation(summary = "Update a publication by id")
-    @ApiResponse(responseCode = "201", description = "Updated  the publication  by id successfully")
+    @ApiResponse(responseCode = "201", description = "Updated the publication by id successfully")
     @PutMapping("/update/{id}")
     public ResponseEntity<PublishResponse> updatePublish(@PathVariable Long id, @RequestBody PublishRequest publishRequest) {
         PublishResponse updatedPublish = publishService.updatePublish(id, publishRequest);
@@ -136,15 +148,15 @@ public class PublishController {
     }
 
     @Operation(summary = "Delete a publication by id")
-    @ApiResponse(responseCode = "201", description = "Deleted the publication  by id successfully")
-    @DeleteMapping(("/delete/{id}"))
+    @ApiResponse(responseCode = "201", description = "Deleted the publication by id successfully")
+    @DeleteMapping("/delete/{id}")
     public String delete(@PathVariable("id") Long id) {
         this.publishService.deletePublish(id);
         return "Delete publish with id:" + id + " successfully delete";
     }
 
     @Operation(summary = "Filter publishes by criteria")
-    @ApiResponse(responseCode = "201", description = "Publishes successfully filtered")
+    @ApiResponse(responseCode = "200", description = "Publishes successfully filtered")
     @GetMapping("/filter")
     public List<PublishResponse> filterPublishes(
             @RequestParam(required = false) Double minTotalArea,
@@ -167,10 +179,13 @@ public class PublishController {
     }
 
     @Operation(summary = "Reset filters publications")
-    @ApiResponse(responseCode = "201", description = "Publishes filters successfully reset")
+    @ApiResponse(responseCode = "200", description = "Publishes filters successfully reset")
     @GetMapping("/resetFilter")
-    public List<PublishResponse> resetFilter(Principal principal) {
-        return publishService.getAll(principal);
+    public ResponseEntity<Page<PublishResponse>> resetFilter(
+            Principal principal,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(publishService.getAllWithPagination(principal, pageable));
     }
-
 }

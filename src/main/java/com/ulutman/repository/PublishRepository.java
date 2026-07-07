@@ -1,23 +1,20 @@
 package com.ulutman.repository;
 
-
 import com.ulutman.model.entities.Publish;
 import com.ulutman.model.enums.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-
-
+import java.util.Optional;
 
 @Repository
 public interface PublishRepository extends JpaRepository<Publish, Long>, JpaSpecificationExecutor<Publish> {
@@ -56,13 +53,13 @@ public interface PublishRepository extends JpaRepository<Publish, Long>, JpaSpec
     @Query("SELECT publish FROM Publish publish WHERE publish.category=('WORK')")
     List<Publish> findByCategoryWork();
 
-    @Query("SELECT  publish FROM Publish publish WHERE  publish.category = 'WORK' AND publish.subCategory= ?1")
+    @Query("SELECT publish FROM Publish publish WHERE publish.category = 'WORK' AND publish.subCategory= ?1")
     List<Publish> findBySubCategoryWORK(Subcategory subCategory);
 
     @Query("SELECT publish FROM Publish publish WHERE publish.category=('RENT')")
     List<Publish> findByCategoryRent();
 
-    @Query("SELECT publish FROM Publish  publish WHERE publish.category = 'RENT' AND publish.subCategory= ?1")
+    @Query("SELECT publish FROM Publish publish WHERE publish.category = 'RENT' AND publish.subCategory= ?1")
     List<Publish> findBySubCategoryRent(Subcategory subCategory);
 
     @Query("SELECT publish FROM Publish publish WHERE publish.category=('SELL')")
@@ -74,16 +71,16 @@ public interface PublishRepository extends JpaRepository<Publish, Long>, JpaSpec
     @Query("SELECT publish FROM Publish publish WHERE publish.category=('HOTEL')")
     List<Publish> findByCategoryHotel();
 
-    @Query("SELECT publish FROM Publish publish WHERE publish.category = 'HOTEL' AND  publish.subCategory =?1")
+    @Query("SELECT publish FROM Publish publish WHERE publish.category = 'HOTEL' AND publish.subCategory =?1")
     List<Publish> findBySubCategoryHotel(Subcategory subCategory);
 
     @Query("SELECT publish FROM Publish publish WHERE publish.category =('AUTO')")
     List<Publish> findByCategoryServices();
 
-    @Query("SELECT publish FROM Publish  publish WHERE publish.category = 'AUTO' AND publish.subCategory =?1")
+    @Query("SELECT publish FROM Publish publish WHERE publish.category = 'AUTO' AND publish.subCategory =?1")
     List<Publish> findBySubCategoryAUTO(Subcategory subCategory);
 
-    @Query("SELECT publish FROM Publish  publish WHERE publish.category = 'SERVICES' AND publish.subCategory =?1")
+    @Query("SELECT publish FROM Publish publish WHERE publish.category = 'SERVICES' AND publish.subCategory =?1")
     List<Publish> findBySubCategoryServices(Subcategory subCategory);
 
     @Query("SELECT publish FROM Publish publish WHERE publish.category=('REAL_ESTATE')")
@@ -151,8 +148,60 @@ public interface PublishRepository extends JpaRepository<Publish, Long>, JpaSpec
 
     @Query("SELECT p FROM Publish p WHERE p.active = true AND p.user.id = :userId ORDER BY p.lastBoostedAt DESC NULLS LAST")
     List<Publish> findAllActivePublishesByUserId(Long userId);
+
+    @Query("SELECT p FROM Publish p LEFT JOIN FETCH p.user WHERE p.id = :id")
+    Optional<Publish> findByIdWithUser(@Param("id") Long id);
+
+    @Query("SELECT DISTINCT p FROM Publish p LEFT JOIN FETCH p.user LEFT JOIN FETCH p.images WHERE p.id = :id")
+    Optional<Publish> findByIdWithUserAndImages(@Param("id") Long id);
+
+    //@Query("SELECT p FROM Publish p LEFT JOIN FETCH p.user WHERE p.user.id = :userId AND p.active = true")
+   // List<Publish> findAllByUserIdWithUser(@Param("userId") Long userId);
+
+    @Query("SELECT DISTINCT p FROM Publish p LEFT JOIN FETCH p.user WHERE p.active = true ORDER BY p.lastBoostedAt DESC NULLS LAST")
+    Page<Publish> findAllActivePublishesWithUser(Pageable pageable);
+
+    @Query("SELECT DISTINCT p FROM Publish p LEFT JOIN FETCH p.user WHERE p.active = true ORDER BY p.lastBoostedAt DESC NULLS LAST")
+    List<Publish> findAllActivePublishesWithUser();
+
+   // @Query("SELECT DISTINCT p FROM Publish p LEFT JOIN FETCH p.user WHERE p.user.id = :userId AND p.active = true ORDER BY p.lastBoostedAt DESC NULLS LAST")
+    //Page<Publish> findAllActivePublishesByUserIdWithUser(@Param("userId") Long userId, Pageable pageable);
+
+   // @Query("SELECT DISTINCT p FROM Publish p LEFT JOIN FETCH p.user WHERE LOWER(p.title) LIKE LOWER(CONCAT(:title, '%'))")
+   // List<Publish> filterPublishesByTitleWithUser(@Param("title") String title);
+
+    //@Query("SELECT DISTINCT p FROM Publish p LEFT JOIN FETCH p.user WHERE (:categories IS NULL OR p.category IN :categories)")
+    //List<Publish> filterPublishesByCategoryWithUser(@Param("categories") List<Category> categories);
+
+   // @Query("SELECT DISTINCT p FROM Publish p LEFT JOIN FETCH p.user WHERE p.publishStatus IN :publishStatuses")
+   // List<Publish> filterPublishesByStatusWithUser(@Param("publishStatuses") List<PublishStatus> publishStatuses);
+
+    //@Query("SELECT DISTINCT p FROM Publish p LEFT JOIN FETCH p.user WHERE LOWER(p.user.name) LIKE LOWER(CONCAT(:names, '%'))")
+   // List<Publish> filterPublishesByUserNameWithUser(@Param("names") String names);
+
+    @Query("SELECT DISTINCT p FROM Publish p LEFT JOIN FETCH p.user JOIN p.propertyDetails pd " +
+            "WHERE (:minTotalArea IS NULL OR pd.totalArea >= :minTotalArea) " +
+            "AND (:maxTotalArea IS NULL OR pd.totalArea <= :maxTotalArea) " +
+            "AND (:minKitchenArea IS NULL OR pd.kitchenArea >= :minKitchenArea) " +
+            "AND (:maxKitchenArea IS NULL OR pd.kitchenArea <= :maxKitchenArea) " +
+            "AND (:minLivingArea IS NULL OR pd.livingArea >= :minLivingArea) " +
+            "AND (:maxLivingArea IS NULL OR pd.livingArea <= :maxLivingArea) " +
+            "AND (:minYear IS NULL OR pd.yearOfConstruction >= :minYear) " +
+            "AND (:maxYear IS NULL OR pd.yearOfConstruction <= :maxYear) " +
+            "AND (:transportType IS NULL OR pd.transportType = :transportType) " +
+            "AND (:walkingDistance IS NULL OR pd.walkingDistance <= :walkingDistance) " +
+            "AND (:transportDistance IS NULL OR pd.transportDistance <= :transportDistance)")
+    List<Publish> filterPublishesWithUser(
+            @Param("minTotalArea") Double minTotalArea,
+            @Param("maxTotalArea") Double maxTotalArea,
+            @Param("minKitchenArea") Double minKitchenArea,
+            @Param("maxKitchenArea") Double maxKitchenArea,
+            @Param("minLivingArea") Double minLivingArea,
+            @Param("maxLivingArea") Double maxLivingArea,
+            @Param("minYear") Integer minYear,
+            @Param("maxYear") Integer maxYear,
+            @Param("transportType") TransportType transportType,
+            @Param("walkingDistance") Double walkingDistance,
+            @Param("transportDistance") Double transportDistance
+    );
 }
-
-
-
-

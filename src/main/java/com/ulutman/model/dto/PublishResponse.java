@@ -45,16 +45,19 @@ public class PublishResponse {
 
     boolean detailFavorite;
 
-    @JsonBackReference
-    AuthResponse user;
+    Long userId;
+    String userName;
+    String userEmail;
+    //@JsonBackReference
+    //AuthResponse user;
 
     CategoryStatus categoryStatus;
 
-    PropertyDetails propertyDetails;
+    //PropertyDetails propertyDetails;
 
     boolean active;
 
-    Conditions conditions;
+   // Conditions conditions;
 
     LocalDateTime nextBoostTime;
 
@@ -63,5 +66,4 @@ public class PublishResponse {
     Long accountId;
 
     Long favoriteCount;
-
 }
