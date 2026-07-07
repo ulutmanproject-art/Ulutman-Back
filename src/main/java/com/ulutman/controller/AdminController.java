@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @Tag(name = "Auth")
 @SecurityRequirement(name = "Authorization")
-@CrossOrigin(origins = "https://backend.ulutman.com")
 public class AdminController {
 
     private final AdminService adminService;

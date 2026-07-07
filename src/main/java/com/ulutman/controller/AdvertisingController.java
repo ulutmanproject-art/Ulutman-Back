@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/advertising")
 @Tag(name = "AdVersting")
 @SecurityRequirement(name = "Authorization")
-@CrossOrigin(origins = "*",maxAge = 3600)
 public class AdvertisingController {
 
 
