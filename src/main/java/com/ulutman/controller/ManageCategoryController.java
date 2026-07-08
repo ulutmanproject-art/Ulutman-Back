@@ -79,17 +79,17 @@ public class ManageCategoryController {
         return manageCategoryService.getAllCategory();
     }
 
-
     @Operation(summary = "Count user publications")
     @ApiResponse(responseCode = "200", description = "Return count of the user's publications")
     @GetMapping("/count/{userId}")
-    public int getNumberOfPublications(@PathVariable Long userId) {
-        return (int) publishService.getNumberOfPublications(userId);
+    public long getNumberOfPublications(@PathVariable Long userId) {
+        return publishService.getNumberOfPublications(userId);
     }
-//    @Operation(summary = "Count user publications ")
-//    @ApiResponse(responseCode = "201", description = "Return count of the user's publications")
+
+//    @Operation(summary = "Count user publications")
+//    @ApiResponse(responseCode = "200", description = "Return count of the user's publications")
 //    @GetMapping("/count/{userId}")
 //    public int getNumberOfPublications(@PathVariable Long userId) {
-//        return publishService.getNumberOfPublications(userId);
+//        return (int) publishService.getNumberOfPublications(userId);
 //    }
 }

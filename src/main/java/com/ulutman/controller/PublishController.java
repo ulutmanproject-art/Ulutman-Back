@@ -116,21 +116,28 @@ public class PublishController {
         }
     }
 
-    @Operation(summary = "Get all publications with pagination")
+    @Operation(summary = "Get all publications")
     @ApiResponse(responseCode = "200", description = "Publications retrieved successfully")
     @GetMapping("/getAll")
-    public ResponseEntity<Page<PublishResponse>> getAllPublishes(
-            Principal principal,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size,
-            @RequestParam(defaultValue = "lastBoostedAt") String sortBy,
-            @RequestParam(defaultValue = "DESC") String sortDirection) {
-
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
-        Pageable pageable = PageRequest.of(page, size, sort);
-        Page<PublishResponse> publishes = publishService.getAllWithPagination(principal, pageable);
+    public ResponseEntity<List<PublishResponse>> getAllPublishes(Principal principal) {
+        List<PublishResponse> publishes = publishService.getAll(principal);
         return ResponseEntity.ok(publishes);
     }
+//    @Operation(summary = "Get all publications with pagination")
+//    @ApiResponse(responseCode = "200", description = "Publications retrieved successfully")
+//    @GetMapping("/getAll")
+//    public ResponseEntity<Page<PublishResponse>> getAllPublishes(
+//            Principal principal,
+//            @RequestParam(defaultValue = "0") int page,
+//            @RequestParam(defaultValue = "20") int size,
+//            @RequestParam(defaultValue = "lastBoostedAt") String sortBy,
+//            @RequestParam(defaultValue = "DESC") String sortDirection) {
+//
+//        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
+//        Pageable pageable = PageRequest.of(page, size, sort);
+//        Page<PublishResponse> publishes = publishService.getAllWithPagination(principal, pageable);
+//        return ResponseEntity.ok(publishes);
+//    }
 
     @Operation(summary = "Get a publication by id")
     @ApiResponse(responseCode = "200", description = "Publication found")
