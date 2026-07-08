@@ -51,6 +51,7 @@ public class PublishService {
     private static final String ADMIN_CHAT_ID = "7825590787";
     private static final String TELEGRAM_BOT_TOKEN = "8916468491:AAGZbYzNTZxBaqayYwl5_fYN2wYsa7BAD6s";
     private final MyPublishRepository myPublishRepository;
+    private final MinioService minioService;
 
     public PublishResponse createPublish(PublishRequest publishRequest) {
         if (publishRequest.getCategory() == null || publishRequest.getSubcategory() == null) {
@@ -65,14 +66,22 @@ public class PublishService {
             throw new IllegalArgumentException("Неверная подкатегория для выбранной категории");
         }
 
+//        List<String> imageUrls = publishRequest.getImages();
+//        log.info("URL изображений: {}", imageUrls);
+//
+//        for (String url : imageUrls) {
+//            if (!url.startsWith("http")) {
+//                throw new IllegalArgumentException("Некорректный URL изображения: " + url);
+//            }
+//        }
         List<String> imageUrls = publishRequest.getImages();
         log.info("URL изображений: {}", imageUrls);
 
-        for (String url : imageUrls) {
-            if (!url.startsWith("http")) {
-                throw new IllegalArgumentException("Некорректный URL изображения: " + url);
-            }
-        }
+        List<String> imageKeys = imageUrls.stream()
+                .map(minioService::extractObjectKey)
+                .toList();
+
+        log.info("Object keys: {}", imageKeys);
 
         Publish publish = publishMapper.mapToEntity(publishRequest);
         publish.setCreatedAt(LocalDateTime.now());
@@ -86,7 +95,7 @@ public class PublishService {
         }
 
         publish.setUser(user);
-        publish.setImages(imageUrls);
+        publish.setImages(imageKeys);
 
         if (publishRequest.getCategory() == Category.HOTEL || publishRequest.getCategory() == Category.RENT || publishRequest.getCategory() == Category.REAL_ESTATE) {
             publish.setPublishStatus(PublishStatus.ОЖИДАЕТ);
@@ -173,7 +182,17 @@ public class PublishService {
         publish.setConditions(conditions);
 
         Publish savedPublish = publishRepository.save(publish);
-        return publishMapper.mapToResponse(savedPublish);
+
+        PublishResponse response = publishMapper.mapToResponse(savedPublish);
+
+        response.setImages(
+                response.getImages().stream()
+                        .map(minioService::presign)
+                        .toList()
+        );
+
+        return response;
+
     }
 
     public PublishResponse findById(Long id, Principal principal) {
@@ -229,6 +248,12 @@ public class PublishService {
         return publishes.stream()
                 .map(publish -> {
                     PublishResponse publishResponse = publishMapper.mapToResponse(publish);
+
+                    publishResponse.setImages(
+                            publishResponse.getImages().stream()
+                                    .map(minioService::presign)
+                                    .toList()
+                    );
 
                     if (userIsLoggedIn) {
                         Favorite favorites = favoriteRepository.getFavoritesByUserId(userId);

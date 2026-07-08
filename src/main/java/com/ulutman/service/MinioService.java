@@ -87,6 +87,8 @@ public class MinioService {
         }
     }
 
+
+
     private String buildKey(MediaFileType type, String entityId, String ext) {
         String folder = switch (type) {
             case PUBLISH_IMAGE -> "publish";
@@ -96,12 +98,35 @@ public class MinioService {
         return folder + "/" + UUID.randomUUID() + ext;
     }
 
-    private String extractObjectKey(String urlOrKey) {
-        String clean = urlOrKey.contains("?") ? urlOrKey.substring(0, urlOrKey.indexOf('?')) : urlOrKey;
-        String marker = "/" + bucket + "/";
-        int idx = clean.indexOf(marker);
-        return idx >= 0 ? clean.substring(idx + marker.length()) : clean;
+    public String extractObjectKey(String urlOrKey) {
+        if (urlOrKey == null || urlOrKey.isBlank()) {
+            return null;
+        }
+
+        String clean = urlOrKey.contains("?")
+                ? urlOrKey.substring(0, urlOrKey.indexOf('?'))
+                : urlOrKey;
+
+        // Если уже objectKey
+        if (clean.startsWith("publish/")) {
+            return clean;
+        }
+
+        // Ищем папку publish/
+        int idx = clean.indexOf("publish/");
+        if (idx >= 0) {
+            return clean.substring(idx);
+        }
+
+        return clean;
     }
+
+//      private String extractObjectKey(String urlOrKey) {
+//        String clean = urlOrKey.contains("?") ? urlOrKey.substring(0, urlOrKey.indexOf('?')) : urlOrKey;
+//        String marker = "/" + bucket + "/";
+//        int idx = clean.indexOf(marker);
+//        return idx >= 0 ? clean.substring(idx + marker.length()) : clean;
+//    }
 
     private String getExtension(String filename) {
         if (filename == null || !filename.contains(".")) return ".bin";
