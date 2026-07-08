@@ -85,11 +85,4 @@ public class ManageCategoryController {
     public long getNumberOfPublications(@PathVariable Long userId) {
         return publishService.getNumberOfPublications(userId);
     }
-
-//    @Operation(summary = "Count user publications")
-//    @ApiResponse(responseCode = "200", description = "Return count of the user's publications")
-//    @GetMapping("/count/{userId}")
-//    public int getNumberOfPublications(@PathVariable Long userId) {
-//        return (int) publishService.getNumberOfPublications(userId);
-//    }
 }
