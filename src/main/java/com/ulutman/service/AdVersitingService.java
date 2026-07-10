@@ -37,6 +37,7 @@ public class AdVersitingService {
     //private static final String TELEGRAM_BOT_TOKEN = "7721979760:AAGc8x9AXc5auPzVZX8ajUQjJvXAgNpK6_g";
     private final MailingService mailingService;
 
+
     @Autowired
     private MinioService minioService;
 
@@ -139,8 +140,20 @@ public class AdVersitingService {
         }
     }
 
+//    public List<AdVersiting> getAllActiveAds() {
+//        return adVersitingRepository.findAllActiveAdverting();
+//    }
+
     public List<AdVersiting> getAllActiveAds() {
-        return adVersitingRepository.findAllActiveAdverting();
+        List<AdVersiting> ads = adVersitingRepository.findAllActiveAdverting();
+
+        ads.forEach(ad -> {
+            if (ad.getImagePath() != null) {
+                ad.setImagePath(minioService.presign(ad.getImagePath()));
+            }
+        });
+
+        return ads;
     }
 
     public boolean deleteAd(Long id, Long userId) {
