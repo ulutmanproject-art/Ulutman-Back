@@ -30,6 +30,7 @@ public class FavoriteService {
     private final PublishRepository publishRepository;
     private final FavoriteMapper favoriteMapper;
     private final PublishMapper publishMapper;
+    private final MinioService minioService;
 
 
     public FavoriteResponse addToFavorites(Long productId, Principal principal) {
@@ -67,6 +68,30 @@ public class FavoriteService {
 
 
 
+//    public FavoriteResponseList getAllFavorites(Principal principal) {
+//        User user = userRepository.findByEmail(principal.getName())
+//                .orElseThrow(() -> new NotFoundException("User not found with email: " + principal.getName()));
+//
+//        Favorite favorites = favoriteRepository.getFavoritesByUserId(user.getId());
+//
+//        FavoriteResponseList favoriteResponseList = new FavoriteResponseList();
+//        favoriteResponseList.setId(user.getId());
+//
+//        List<PublishResponse> publishResponseList = new ArrayList<>();
+//
+//        if (favorites != null && favorites.getPublishes() != null) {
+//            for (Publish publish : favorites.getPublishes()) {
+//                PublishResponse publishResponse = publishMapper.mapToResponse(publish);
+//                publishResponse.setDetailFavorite(true); // Публикация в избранном
+//                publishResponseList.add(publishResponse);
+//            }
+//        }
+//
+//        favoriteResponseList.setPublishResponseList(publishResponseList);
+//        return favoriteResponseList;
+//    }
+
+
     public FavoriteResponseList getAllFavorites(Principal principal) {
         User user = userRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new NotFoundException("User not found with email: " + principal.getName()));
@@ -81,7 +106,15 @@ public class FavoriteService {
         if (favorites != null && favorites.getPublishes() != null) {
             for (Publish publish : favorites.getPublishes()) {
                 PublishResponse publishResponse = publishMapper.mapToResponse(publish);
-                publishResponse.setDetailFavorite(true); // Публикация в избранном
+
+                publishResponse.setImages(
+                        publishResponse.getImages().stream()
+                                .map(minioService::presign)
+                                .toList()
+                );
+
+                publishResponse.setDetailFavorite(true);
+
                 publishResponseList.add(publishResponse);
             }
         }
@@ -89,7 +122,6 @@ public class FavoriteService {
         favoriteResponseList.setPublishResponseList(publishResponseList);
         return favoriteResponseList;
     }
-
 
 
     public void deleteFromFavorites(Long productId, Principal principal) {
