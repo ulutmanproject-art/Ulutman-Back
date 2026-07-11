@@ -52,10 +52,18 @@ public class ManageMailingService {
 
                 System.out.println("Письмо отправлено: " + email);
 
+                // Пауза 1 секунда, чтобы не превысить лимит Resend
+                Thread.sleep(3000);
+
+            } catch (InterruptedException e) {
+
+                Thread.currentThread().interrupt();
+                System.err.println("Поток был прерван");
+
             } catch (Exception e) {
 
                 System.err.println("Ошибка отправки на: " + email);
-                e.printStackTrace();
+                System.err.println(e.getMessage());
 
                 // продолжаем рассылку остальным пользователям
             }
