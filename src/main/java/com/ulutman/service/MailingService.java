@@ -43,8 +43,8 @@ public class MailingService {
                 .orElseThrow();
 
         CreateEmailOptions params = CreateEmailOptions.builder()
-                .from("Ulutman <onboarding@resend.dev>")
-                .to("ulutmanproject@gmail.com")
+                .from("Ulutman <noreply@ulutman-api.com>")
+                .to(recipientEmail)
                 .subject(mailing.getTitle())
                 .html("""
                     <h1>%s</h1>

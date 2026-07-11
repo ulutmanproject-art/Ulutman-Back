@@ -36,34 +36,62 @@ public class ManageMailingService {
     private final MailingService mailingService;
     private final UserRepository userRepository;
 
+    public MailingResponse createMailingAndSendToAll(MailingRequest request) {
 
-    public MailingResponse createMailingAndSendToAll(
-            MailingRequest request
-    ) {
-
-        MailingResponse response =
-                mailingService.createMailing(request);
+        MailingResponse response = mailingService.createMailing(request);
 
         List<User> users = userRepository.findAll();
 
         for (User user : users) {
 
+            String email = user.getEmail();
+
             try {
 
-                mailingService.sendMailingg(
-                        response.getId(),
-                        user.getEmail()
-                );
+                mailingService.sendMailingg(response.getId(), email);
+
+                System.out.println("Письмо отправлено: " + email);
 
             } catch (Exception e) {
 
+                System.err.println("Ошибка отправки на: " + email);
                 e.printStackTrace();
+
+                // продолжаем рассылку остальным пользователям
             }
         }
 
         return response;
+    }
 
-   }
+
+//    public MailingResponse createMailingAndSendToAll(
+//            MailingRequest request
+//    ) {
+//
+//        MailingResponse response =
+//                mailingService.createMailing(request);
+//
+//        List<User> users = userRepository.findAll();
+//
+//        for (User user : users) {
+//
+//            try {
+//
+//                mailingService.sendMailingg(
+//                        response.getId(),
+//                        user.getEmail()
+//                );
+//
+//            } catch (Exception e) {
+//
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        return response;
+//
+//   }
 
 
     public List<User> getAllUsersWithMailings() {
