@@ -45,24 +45,75 @@ public class ManageMailingService {
 
         List<User> users = userRepository.findAll();
 
+        int successCount = 0;
+        int failedCount = 0;
+
+        log.info("Начинаем рассылку. Всего пользователей: {}", users.size());
+
         for (User user : users) {
 
             try {
 
-                mailingService.sendMailing(
+                if (user.getEmail() == null || user.getEmail().isBlank()) {
+                    log.warn("Пользователь {} без email, пропускаем", user.getId());
+                    continue;
+                } mailingService.sendMailing(
                         response.getId(),
                         user.getEmail()
                 );
 
+                successCount++;
+
+                log.info("Письмо отправлено: {}", user.getEmail());
+
             } catch (Exception e) {
 
-                e.printStackTrace();
+                failedCount++;
+
+                log.error(
+                        "Не удалось отправить письмо пользователю: {}. Причина: {}",
+                        user.getEmail(),
+                        e.getMessage()
+                );
             }
         }
+        log.info(
+                "Рассылка завершена. Успешно: {}, Ошибок: {}",
+                successCount,
+                failedCount
+        );
 
         return response;
-
     }
+
+
+//    public MailingResponse createMailingAndSendToAll(
+//            MailingRequest request
+//    ) {
+//
+//        MailingResponse response =
+//                mailingService.createMailing(request);
+//
+//        List<User> users = userRepository.findAll();
+//
+//        for (User user : users) {
+//
+//            try {
+//
+//                mailingService.sendMailing(
+//                        response.getId(),
+//                        user.getEmail()
+//                );
+//
+//            } catch (Exception e) {
+//
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        return response;
+//
+//    }
 
 
     public List<User> getAllUsersWithMailings() {
