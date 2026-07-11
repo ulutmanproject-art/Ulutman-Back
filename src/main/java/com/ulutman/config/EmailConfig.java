@@ -24,27 +24,16 @@ public class EmailConfig {
         mailSender.setPort(587);
         mailSender.setUsername("ulutmanproject@gmail.com");
         mailSender.setPassword("wraj wuqm upmk sjbc");
-//
-//        props.put("mail.transport.protocol", "smtp");
-//        props.put("mail.smtp.auth", "true");
-//        props.put("mail.smtp.starttls.enable", "true");
-//        props.put("mail.smtp.starttls.required", "true");
-//        props.put("mail.debug", "true");
-//        props.put("mail.smtp.encoding", "UTF-8");
 
         Properties props = mailSender.getJavaMailProperties();
 
         props.put("mail.transport.protocol", "smtp");
         props.put("mail.smtp.auth", "true");
-
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.smtp.starttls.required", "true");
-
-        props.put("mail.smtp.connectiontimeout", "10000");
-        props.put("mail.smtp.timeout", "10000");
-        props.put("mail.smtp.writetimeout", "10000");
-
+        props.put("mail.debug", "true");
         props.put("mail.smtp.encoding", "UTF-8");
+
 
         return mailSender;
     }
