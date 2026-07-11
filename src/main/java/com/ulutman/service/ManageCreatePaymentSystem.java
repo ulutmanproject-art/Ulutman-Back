@@ -56,12 +56,12 @@ public class ManageCreatePaymentSystem {
 
         publication.setActive(false);
         publishRepository.save(publication);
-        mailingService.sendMailing1(
+        mailingService.sendMailing11(
                 publication.getUser().getEmail(),
                 "Уведомление о том, что ваша публикация не активирована",
                 "Привет, на связи отдел договоров Ulutman.ru!\n" +
                 "Ваша публикация не активирована: {" + publication + "}. Возможно, причины связаны с оплатой или с условиями Ulutman.ru.\n" +
-                "Она не будет отображаться на Ulutman.ru.\nСвяжитесь с поддержкой сайта для получения дополнительной информации." +
+                "Она не будет отображаться на Ulutman \nСвяжитесь с поддержкой сайта для получения дополнительной информации." +
                 "\nС уважением," +
                 "\nКоманда Ulutman.ru"
         );

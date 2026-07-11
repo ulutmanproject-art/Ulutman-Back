@@ -31,7 +31,7 @@ public class ManagePaymentAdversting {
 
         publication.setActive(true);
         adVersitingRepository.save(publication);
-        mailingService.sendMailing1(
+        mailingService.sendMailing11(
                 publication.getUser().getEmail(),
                 "Ваша реклама активирована!",
                 "Мы рады сообщить вам, что ваша реклама по id; " + publication.getId() + " успешно активирована на сайте ULUTMAN.ru \n" +
