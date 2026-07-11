@@ -35,21 +35,47 @@ public class MyPublishesService {
     private final AdVersitingRepository adVersitingRepository;
     private final MyPublishRepository myPublishRepository;
     private final AdVersitingMapper adVersitingMapper;
+    private final MinioService minioService;
 
-    public List<PublishResponse> myActivePublishes(Long userId) {
-        List<Publish> myActivePublish = publishRepository.findAllActivePublishesByUserId(userId);
+//    public List<PublishResponse> myActivePublishes(Long userId) {
+//        List<Publish> myActivePublish = publishRepository.findAllActivePublishesByUserId(userId);
+//
+//        return myActivePublish.stream()
+//                .map(this::mapToResponseWithNextBoost)
+//                .collect(Collectors.toList());
+//    }
+public List<PublishResponse> myActivePublishes(Long userId) {
+    List<Publish> myActivePublish = publishRepository.findAllActivePublishesByUserId(userId);
 
-        return myActivePublish.stream()
-                .map(this::mapToResponseWithNextBoost)
-                .collect(Collectors.toList());
-    }
+    return myActivePublish.stream()
+            .map(publish -> {
+                PublishResponse response = mapToResponseWithNextBoost(publish);
+
+                response.setImages(
+                        response.getImages().stream()
+                                .map(minioService::presign)
+                                .toList()
+                );
+
+                return response;
+            })
+            .collect(Collectors.toList());
+}
 
     public List<AdVersitingResponse> getAllActiveAdsForUser(Long userId) {
-        List<AdVersiting> myActivePublish = adVersitingRepository.findAllActiveAdvertingByUserId(userId);
-
+        List<AdVersiting> myActivePublish =
+                adVersitingRepository.findAllActiveAdvertingByUserId(userId);
 
         return myActivePublish.stream()
-                .map(this::mapToAdResponseWithNextBoost)
+                .map(ad -> {
+                    AdVersitingResponse response = mapToAdResponseWithNextBoost(ad);
+
+                    response.setImageFile(
+                            minioService.presign(response.getImageFile())
+                    );
+
+                    return response;
+                })
                 .collect(Collectors.toList());
     }
 
