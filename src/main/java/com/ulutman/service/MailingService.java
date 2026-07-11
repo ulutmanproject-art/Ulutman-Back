@@ -1,5 +1,8 @@
 package com.ulutman.service;
 
+import com.resend.Resend;
+import com.resend.core.exception.ResendException;
+import com.resend.services.emails.model.CreateEmailOptions;
 import com.ulutman.mapper.MailingMapper;
 import com.ulutman.model.dto.MailingRequest;
 import com.ulutman.model.dto.MailingResponse;
@@ -31,6 +34,51 @@ public class MailingService {
     private final MailingMapper mailingMapper;
     private final JavaMailSender javaMailSender;
     private final UserRepository userRepository;
+
+    private final Resend resend;
+
+    public void sendMailingg(Long mailingId, String recipientEmail) {
+
+        Mailing mailing = mailingRepository.findById(mailingId)
+                .orElseThrow();
+
+        CreateEmailOptions params = CreateEmailOptions.builder()
+                .from("Ulutman <onboarding@resend.dev>")
+                .to("ulutmanproject@gmail.com")
+                .subject(mailing.getTitle())
+                .html("""
+                    <h1>%s</h1>
+
+                    <p>%s</p>
+
+                    <p><b>Тип:</b> %s</p>
+
+                    <p><b>Начало:</b> %s</p>
+
+                    <p><b>Конец:</b> %s</p>
+                    """.formatted(
+                        mailing.getTitle(),
+                        mailing.getMessage(),
+                        mailing.getMailingType(),
+                        mailing.getPromotionStartDate(),
+                        mailing.getPromotionEndDate()
+                ))
+                .build();
+
+        try {
+            resend.emails().send(params);
+            mailing.setMailingStatus(MailingStatus.ОТПРАВЛЕНО);
+
+        } catch (ResendException e) {
+            mailing.setMailingStatus(MailingStatus.ОШИБКА);
+            throw new RuntimeException("Ошибка отправки письма", e);
+
+        } finally {
+            mailingRepository.save(mailing);
+        }
+    }
+
+
 
     public MailingResponse createMailing(MailingRequest mailingRequest) {
         Mailing mailing = mailingMapper.mapToEntity(mailingRequest);

@@ -42,6 +42,10 @@ springdoc:
 jwt:
   secret: ${JWT_SECRET}
 
+
+resend:
+  api-key: re_doKJo4mA_FWwLCoPCF5uizSgqcJjh2DQ2
+
 minio:
   url: ${AWS_ENDPOINT_URL:https://fly.storage.tigris.dev}
   access-key: ${AWS_ACCESS_KEY_ID:changeme}

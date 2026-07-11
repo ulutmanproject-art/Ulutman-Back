@@ -50,7 +50,7 @@ public class ManageMailingService {
 
             try {
 
-                mailingService.sendMailing(
+                mailingService.sendMailingg(
                         response.getId(),
                         user.getEmail()
                 );

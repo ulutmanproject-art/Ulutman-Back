@@ -8,6 +8,11 @@ spring:
 jwt:
   secret: localdevsecretkey_at_least_32_characters_long_for_hs256
 
+
+resend:
+    api-key: re_doKJo4mA_FWwLCoPCF5uizSgqcJjh2DQ2
+
+
 minio:
   url: https://fly.storage.tigris.dev
   access-key: tid_dT_HHHrvCoE_FTBxQ_iuEuSNDoRceWarFoOLjSSvTmoGZQmqYh
