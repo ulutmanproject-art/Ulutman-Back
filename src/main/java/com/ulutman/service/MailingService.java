@@ -71,7 +71,7 @@ public class MailingService {
 
         helper.setTo(recipientEmail);
         helper.setSubject(mailing.getTitle());
-
+        helper.setFrom("ulutmanproject@gmail.com");
         String body = "<html><body>"
                       + "<h1>" + mailing.getTitle() + "</h1>"
                       + "<p>" + mailing.getMessage() + "</p>"
