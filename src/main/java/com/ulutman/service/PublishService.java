@@ -195,6 +195,25 @@ public class PublishService {
 
     }
 
+//    public PublishResponse findById(Long id, Principal principal) {
+//        Publish publish = publishRepository.findByIdWithUser(id)
+//                .orElseThrow(() -> new EntityNotFoundException("Публикация по идентификатору " + id + " не найдена"));
+//
+//        if (principal != null) {
+//            User user = userRepository.findByEmail(principal.getName())
+//                    .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+//
+//            Favorite favorites = favoriteRepository.getFavoritesByUserId(user.getId());
+//            if (favorites != null && favorites.getPublishes().contains(publish)) {
+//                publish.setDetailFavorite(true);
+//            } else {
+//                publish.setDetailFavorite(false);
+//            }
+//        }
+//
+//        return publishMapper.mapToResponse(publish);
+//    }
+
     public PublishResponse findById(Long id, Principal principal) {
         Publish publish = publishRepository.findByIdWithUser(id)
                 .orElseThrow(() -> new EntityNotFoundException("Публикация по идентификатору " + id + " не найдена"));
@@ -204,6 +223,7 @@ public class PublishService {
                     .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
 
             Favorite favorites = favoriteRepository.getFavoritesByUserId(user.getId());
+
             if (favorites != null && favorites.getPublishes().contains(publish)) {
                 publish.setDetailFavorite(true);
             } else {
@@ -211,7 +231,15 @@ public class PublishService {
             }
         }
 
-        return publishMapper.mapToResponse(publish);
+        PublishResponse response = publishMapper.mapToResponse(publish);
+
+        response.setImages(
+                response.getImages().stream()
+                        .map(minioService::presign)
+                        .toList()
+        );
+
+        return response;
     }
 
     public Page<PublishResponse> getAllWithPagination(Principal principal, Pageable pageable) {
