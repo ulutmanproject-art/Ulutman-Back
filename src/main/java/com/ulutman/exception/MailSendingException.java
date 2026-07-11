@@ -1,8 +1,12 @@
 package com.ulutman.exception;
 
-import org.springframework.mail.MailException;
-
 public class MailSendingException extends RuntimeException {
-    public MailSendingException(String string, MailException e) {
+
+    public MailSendingException(String message) {
+        super(message);
+    }
+
+    public MailSendingException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

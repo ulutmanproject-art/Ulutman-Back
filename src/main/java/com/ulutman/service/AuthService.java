@@ -1,5 +1,8 @@
 package com.ulutman.service;
 
+import com.resend.Resend;
+import com.resend.core.exception.ResendException;
+import com.resend.services.emails.model.CreateEmailOptions;
 import com.ulutman.exception.IncorrectCodeException;
 import com.ulutman.exception.MailSendingException;
 import com.ulutman.exception.NotFoundException;
@@ -46,6 +49,7 @@ public class AuthService {
     AuthenticationManager manager;
     LoginMapper loginMapper;
     JavaMailSender mailSender;
+    private final Resend resend;
 
     public AuthResponse saveUser(AuthRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -131,18 +135,59 @@ public class AuthService {
         throw new UnsupportedOperationException("Google auth не поддерживается");
     }
 
+//    public void sendPasswordResetCode(String email) throws EntityNotFoundException {
+//        int pinCode = generatePinCode();
+//        SimpleMailMessage message = new SimpleMailMessage();
+//        message.setTo(email);
+//        message.setFrom("ajzirektoktosunova853@gmail.com");
+//        message.setSubject("Password reset");
+//        message.setText(String.valueOf(pinCode));
+//        try {
+//            mailSender.send(message);
+//            updateUserPinCode(email, pinCode);
+//        } catch (MailException e) {
+//            throw new MailSendingException("Не удалось отправить код для сброса пароля", e);
+//        }
+//    }
+
+
     public void sendPasswordResetCode(String email) throws EntityNotFoundException {
+
         int pinCode = generatePinCode();
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(email);
-        message.setFrom("ajzirektoktosunova853@gmail.com");
-        message.setSubject("Password reset");
-        message.setText(String.valueOf(pinCode));
+
+        CreateEmailOptions params = CreateEmailOptions.builder()
+                .from("Ulutman <noreply@ulutman-api.com>")
+                .to(email)
+                .subject("Восстановление пароля")
+                .html("""
+            <h2>Восстановление пароля</h2>
+
+            <p>Здравствуйте!</p>
+
+            <p>Для восстановления пароля на сайте <b>Ulutman</b> используйте следующий код:</p>
+
+            <h1 style="letter-spacing: 5px;">%s</h1>
+
+            <p>Введите этот код на странице восстановления пароля.</p>
+
+            <hr>
+
+            <p>С уважением,<br>
+            Команда <b>Ulutman</b></p>
+            """.formatted(pinCode))
+                .build();
         try {
-            mailSender.send(message);
+
+            resend.emails().send(params);
+
             updateUserPinCode(email, pinCode);
-        } catch (MailException e) {
-            throw new MailSendingException("Не удалось отправить код для сброса пароля", e);
+
+        } catch (ResendException e) {
+
+            throw new MailSendingException(
+                    "Не удалось отправить код для сброса пароля",
+                    e
+            );
         }
     }
 
