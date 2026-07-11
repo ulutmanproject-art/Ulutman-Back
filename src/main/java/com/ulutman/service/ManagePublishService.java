@@ -1,5 +1,6 @@
 package com.ulutman.service;
 
+import com.resend.Resend;
 import com.ulutman.exception.NotFoundException;
 import com.ulutman.mapper.PublishMapper;
 import com.ulutman.model.dto.PublishDetailsResponse;
@@ -32,6 +33,7 @@ public class ManagePublishService {
     private final PublishRepository publishRepository;
     private final UserRepository userRepository;
     private final MailingService mailingService;
+    private final Resend resend;
 
     public List<PublishDetailsResponse> getAllPublish() {
         return publishRepository.findAll().stream().map(publishMapper::mapToDetailsResponse).collect(Collectors.toList());
@@ -132,7 +134,7 @@ public class ManagePublishService {
 
         publishRepository.save(publish);
 
-        mailingService.sendMailing1(
+        mailingService.sendMailing11(
                 publish.getUser().getEmail(),
                 "Ваша публикация активирована!",
                 "Мы рады сообщить вам, что ваша публикация успешно активирована на сайте ULUTMAN.\n" +

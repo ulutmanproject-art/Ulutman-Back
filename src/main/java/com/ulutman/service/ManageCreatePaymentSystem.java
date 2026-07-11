@@ -38,7 +38,7 @@ public class ManageCreatePaymentSystem {
 
         publication.setActive(true);
         publishRepository.save(publication);
-        mailingService.sendMailing1(
+        mailingService.sendMailing11(
                 publication.getUser().getEmail(),
                 "Ваша публикация активирована!",
                 "Мы рады сообщить вам, что ваша публикация «" + publication + "» успешно активирована на сайте ULUTMAN.ru \n" +

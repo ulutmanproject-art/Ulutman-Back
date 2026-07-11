@@ -3,6 +3,7 @@ package com.ulutman.service;
 import com.resend.Resend;
 import com.resend.core.exception.ResendException;
 import com.resend.services.emails.model.CreateEmailOptions;
+import com.ulutman.exception.MailSendingException;
 import com.ulutman.mapper.MailingMapper;
 import com.ulutman.model.dto.MailingRequest;
 import com.ulutman.model.dto.MailingResponse;
@@ -108,6 +109,35 @@ public class MailingService {
         message.setSubject(subject);
         message.setText(text);
         javaMailSender.send(message);
+    }
+
+    public void sendMailing11(String to, String subject, String text) {
+        CreateEmailOptions params = CreateEmailOptions.builder()
+                .from("Ulutman <noreply@ulutman-api.com>")
+                .to(to)
+                .subject(subject)
+                .html("""
+                    <h2>%s</h2>
+
+                    <p>%s</p>
+
+                    <hr>
+
+                
+                    """.formatted(
+                        subject,
+                        text.replace("\n", "<br>")
+                ))
+                .build();
+
+        try {
+            resend.emails().send(params);
+        } catch (ResendException e) {
+            throw new MailSendingException(
+                    "Не удалось отправить письмо",
+                    e
+            );
+        }
     }
 
     public void sendMailing(Long mailingId, String recipientEmail) throws MessagingException {
