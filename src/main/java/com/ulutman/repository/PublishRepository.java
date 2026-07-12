@@ -19,7 +19,6 @@ import java.util.Optional;
 @Repository
 public interface PublishRepository extends JpaRepository<Publish, Long>, JpaSpecificationExecutor<Publish> {
 
-
     @Query("SELECT p FROM Publish p WHERE p.user.id = :userId")
     List<Publish> findAllByUserId(@Param("userId") Long userId);
 
@@ -155,29 +154,11 @@ public interface PublishRepository extends JpaRepository<Publish, Long>, JpaSpec
     @Query("SELECT DISTINCT p FROM Publish p LEFT JOIN FETCH p.user LEFT JOIN FETCH p.images WHERE p.id = :id")
     Optional<Publish> findByIdWithUserAndImages(@Param("id") Long id);
 
-    //@Query("SELECT p FROM Publish p LEFT JOIN FETCH p.user WHERE p.user.id = :userId AND p.active = true")
-   // List<Publish> findAllByUserIdWithUser(@Param("userId") Long userId);
-
     @Query("SELECT DISTINCT p FROM Publish p LEFT JOIN FETCH p.user WHERE p.active = true ORDER BY p.lastBoostedAt DESC NULLS LAST")
     Page<Publish> findAllActivePublishesWithUser(Pageable pageable);
 
     @Query("SELECT DISTINCT p FROM Publish p LEFT JOIN FETCH p.user WHERE p.active = true ORDER BY p.lastBoostedAt DESC NULLS LAST")
     List<Publish> findAllActivePublishesWithUser();
-
-   // @Query("SELECT DISTINCT p FROM Publish p LEFT JOIN FETCH p.user WHERE p.user.id = :userId AND p.active = true ORDER BY p.lastBoostedAt DESC NULLS LAST")
-    //Page<Publish> findAllActivePublishesByUserIdWithUser(@Param("userId") Long userId, Pageable pageable);
-
-   // @Query("SELECT DISTINCT p FROM Publish p LEFT JOIN FETCH p.user WHERE LOWER(p.title) LIKE LOWER(CONCAT(:title, '%'))")
-   // List<Publish> filterPublishesByTitleWithUser(@Param("title") String title);
-
-    //@Query("SELECT DISTINCT p FROM Publish p LEFT JOIN FETCH p.user WHERE (:categories IS NULL OR p.category IN :categories)")
-    //List<Publish> filterPublishesByCategoryWithUser(@Param("categories") List<Category> categories);
-
-   // @Query("SELECT DISTINCT p FROM Publish p LEFT JOIN FETCH p.user WHERE p.publishStatus IN :publishStatuses")
-   // List<Publish> filterPublishesByStatusWithUser(@Param("publishStatuses") List<PublishStatus> publishStatuses);
-
-    //@Query("SELECT DISTINCT p FROM Publish p LEFT JOIN FETCH p.user WHERE LOWER(p.user.name) LIKE LOWER(CONCAT(:names, '%'))")
-   // List<Publish> filterPublishesByUserNameWithUser(@Param("names") String names);
 
     @Query("SELECT DISTINCT p FROM Publish p LEFT JOIN FETCH p.user JOIN p.propertyDetails pd " +
             "WHERE (:minTotalArea IS NULL OR pd.totalArea >= :minTotalArea) " +
