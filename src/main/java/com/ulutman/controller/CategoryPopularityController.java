@@ -23,7 +23,7 @@ public class CategoryPopularityController {
 
     @Operation(summary = "View categories")
     @ApiResponse(responseCode = "201", description = "Viewed category successfully")
-    @PostMapping("/view/{category}")  //просмотр категорий
+    @PostMapping("/view/{category}")
     public ResponseEntity<String> viewCategory(@PathVariable Category category) {
         popularityService.incrementViews(category);
         return ResponseEntity.ok("Просмотр увеличен для каждой категории: " + category);
@@ -31,7 +31,7 @@ public class CategoryPopularityController {
 
     @Operation(summary = "Get to view categories")
     @ApiResponse(responseCode = "201", description = "Received viewed categories successfully")
-    @GetMapping("/popularity/views")
+    @GetMapping("/statistics/views")
     public ResponseEntity<Map<Category, Integer>> getPopularityByViews() {
         Map<Category, Integer> popularity = popularityService.getCategoryPopularity(true);
         return ResponseEntity.ok(popularity);
@@ -39,7 +39,7 @@ public class CategoryPopularityController {
 
     @Operation(summary = "Get to popularity publications")
     @ApiResponse(responseCode = "201", description = "Received popularity publications successfully")
-    @GetMapping("/popularity/publications")
+    @GetMapping("/statistics/publications")
     public ResponseEntity<Map<Category, Integer>> getPopularityByPublications() {
         Map<Category, Integer> popularity = popularityService.getCategoryPopularity(false);
         return ResponseEntity.ok(popularity);

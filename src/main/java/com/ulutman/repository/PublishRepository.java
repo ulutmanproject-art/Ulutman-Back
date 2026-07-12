@@ -204,4 +204,6 @@ public interface PublishRepository extends JpaRepository<Publish, Long>, JpaSpec
             @Param("walkingDistance") Double walkingDistance,
             @Param("transportDistance") Double transportDistance
     );
+
+    int countByCategory(Category category);
 }

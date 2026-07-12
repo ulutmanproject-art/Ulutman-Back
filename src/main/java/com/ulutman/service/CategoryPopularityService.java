@@ -3,6 +3,7 @@ package com.ulutman.service;
 import com.ulutman.model.entities.CategoryPopularity;
 import com.ulutman.model.enums.Category;
 import com.ulutman.repository.CategoryPopularityRepository;
+import com.ulutman.repository.PublishRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -20,6 +21,7 @@ import java.util.Map;
 public class CategoryPopularityService {
 
     private final CategoryPopularityRepository popularityRepository;
+    private final PublishRepository publishRepository;
 
     public void incrementViews(Category category) {
         CategoryPopularity popularity = popularityRepository.findByCategory(category)
@@ -31,13 +33,24 @@ public class CategoryPopularityService {
 
     public Map<Category, Integer> getCategoryPopularity(boolean byViews) {
         Map<Category, Integer> popularityMap = new HashMap<>();
-        List<CategoryPopularity> popularities = popularityRepository.findAll();
 
-        for (CategoryPopularity popularity : popularities) {
-            int popularityCount = byViews ? popularity.getViews() : popularity.getPublications();
-            popularityMap.put(popularity.getCategory(), popularityCount);
+        for (Category category : Category.values()) {
+            popularityMap.put(category, 0);
         }
 
+        if (byViews) {
+            List<CategoryPopularity> popularities = popularityRepository.findAll();
+            for (CategoryPopularity popularity : popularities) {
+                popularityMap.put(popularity.getCategory(), popularity.getViews());
+            }
+        } else {
+            for (Category category : Category.values()) {
+                int count = publishRepository.countByCategory(category);
+                popularityMap.put(category, count);
+            }
+        }
+
+        log.info("Возвращаем статистику: {}", popularityMap);
         return popularityMap;
     }
 }
