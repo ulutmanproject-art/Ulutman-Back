@@ -50,17 +50,19 @@ public class MyPublishesController {
         return publishService.getAllActiveAdsForUser(userId);
     }
 
-    @Operation(summary = "Removes advertisements by user ID")
-    @ApiResponse(responseCode = "201", description = "successfully removes advertisements by user ID")
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteAd(@PathVariable Long id, @AuthenticationPrincipal User userDetails) {
+    @Operation(summary = "Удаление нескольких реклам пользователем")
+    @ApiResponse(responseCode = "200", description = "Рекламы успешно удалены")
+    @DeleteMapping("/delete-multiple")
+    public ResponseEntity<String> deleteMultipleAds(
+            @RequestBody List<Long> adIds,
+            @AuthenticationPrincipal User userDetails
+    ) {
+
         Long userId = userDetails.getId();
-        boolean deleted = adVersitingService.deleteAd(id, userId);
-        if (deleted) {
-            return ResponseEntity.ok("Объявление успешно удалено");
-        } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Вы не можете удалить это объявление");
-        }
+
+        adVersitingService.deleteMultipleAds(adIds, userId);
+
+        return ResponseEntity.ok("Рекламы успешно удалены");
     }
 
     @Operation(summary = "Deletes a user's publishes")

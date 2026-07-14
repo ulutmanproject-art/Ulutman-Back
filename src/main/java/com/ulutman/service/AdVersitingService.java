@@ -6,6 +6,7 @@ import com.ulutman.model.enums.MediaFileType;
 import com.ulutman.repository.AdVersitingRepository;
 import com.ulutman.repository.UserRepository;
 import jakarta.mail.MessagingException;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -156,12 +157,23 @@ public class AdVersitingService {
         return ads;
     }
 
-    public boolean deleteAd(Long id, Long userId) {
-        Optional<AdVersiting> ad = adVersitingRepository.findById(id);
-        if (ad.isPresent() && ad.get().getUser().getId().equals(userId)) {
-            adVersitingRepository.delete(ad.get());
-            return true;
+    @Transactional
+    public void deleteMultipleAds(List<Long> adIds, Long userId) {
+
+        List<AdVersiting> advertisements =
+                adVersitingRepository.findAllById(adIds);
+
+
+        for (AdVersiting ad : advertisements) {
+
+            if (!ad.getUser().getId().equals(userId)) {
+                throw new RuntimeException(
+                        "Нет доступа к рекламе id: " + ad.getId()
+                );
+            }
         }
-        return false;
+
+
+        adVersitingRepository.deleteAll(advertisements);
     }
 }
