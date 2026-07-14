@@ -50,7 +50,7 @@ public class PublishController {
             @RequestParam("metro") Metro metro,
             @RequestParam("address") String address,
             @RequestParam("phoneNumber") String phoneNumber,
-            @RequestParam("images") List<MultipartFile> images,
+            @RequestParam(value = "images", required = false) List<MultipartFile> images,
             @RequestParam("price") String price,
             @RequestParam("category") Category category,
             @RequestParam("subcategory") Subcategory subcategory,
@@ -67,10 +67,16 @@ public class PublishController {
 
         try {
             List<String> imageUrls = new ArrayList<>();
-            for (MultipartFile file : images) {
-                String objectKey = minioService.upload(file, MediaFileType.PUBLISH_IMAGE, "general");
-                imageUrls.add(minioService.presign(objectKey));
+
+            if (images != null && !images.isEmpty()) {
+                for (MultipartFile file : images) {
+                    if (!file.isEmpty()) {
+                        String objectKey = minioService.upload(file, MediaFileType.PUBLISH_IMAGE, "general");
+                        imageUrls.add(minioService.presign(objectKey));
+                    }
+                }
             }
+
             publishRequest.setImages(imageUrls);
 
             if (paymentReceiptFile != null && !paymentReceiptFile.isEmpty()) {
@@ -79,7 +85,7 @@ public class PublishController {
                 publishRequest.setPaymentReceiptFile(Optional.empty());
             }
         } catch (Exception e) {
-            logger.error("Ошибка загрузки файлов в MinIO: {}", e.getMessage());
+            logger.error("Ошибка загрузки файлов в MinIO: {}", e.getMessage(), e);
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 

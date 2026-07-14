@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -67,6 +68,10 @@ public class PublishService {
         }
 
         List<String> imageUrls = publishRequest.getImages();
+        if (imageUrls == null) {
+            imageUrls = Collections.emptyList();
+        }
+
         log.info("URL изображений: {}", imageUrls);
 
         List<String> imageKeys = imageUrls.stream()
@@ -89,14 +94,19 @@ public class PublishService {
         publish.setUser(user);
         publish.setImages(imageKeys);
 
-        if (publishRequest.getCategory() == Category.HOTEL || publishRequest.getCategory() == Category.RENT || publishRequest.getCategory() == Category.REAL_ESTATE) {
+        if (publishRequest.getCategory() == Category.HOTEL
+                || publishRequest.getCategory() == Category.RENT
+                || publishRequest.getCategory() == Category.REAL_ESTATE) {
             publish.setPublishStatus(PublishStatus.ОЖИДАЕТ);
         } else {
             publish.setPublishStatus(PublishStatus.ОДОБРЕН);
         }
+
         publish.setCategoryStatus(CategoryStatus.АКТИВНО);
 
-        if (publishRequest.getCategory() == Category.RENT || publishRequest.getCategory() == Category.HOTEL || publishRequest.getCategory() == Category.REAL_ESTATE) {
+        if (publishRequest.getCategory() == Category.RENT
+                || publishRequest.getCategory() == Category.HOTEL
+                || publishRequest.getCategory() == Category.REAL_ESTATE) {
             publish.setActive(false);
         } else {
             publish.setActive(true);
@@ -109,11 +119,17 @@ public class PublishService {
             throw new IllegalArgumentException("Ошибка при сохранении публикации: " + e.getMessage());
         }
 
-        if (publishRequest.getCategory() == Category.RENT || publishRequest.getCategory() == Category.HOTEL || publishRequest.getCategory() == Category.REAL_ESTATE) {
+        if (publishRequest.getCategory() == Category.RENT
+                || publishRequest.getCategory() == Category.HOTEL
+                || publishRequest.getCategory() == Category.REAL_ESTATE) {
+
             String bankName = publishRequest.getBank()
-                    .orElseThrow(() -> new IllegalArgumentException("Необходимо выбрать банк для категории " + publishRequest.getCategory()));
-            MultipartFile receiptFile = (MultipartFile) publishRequest.getPaymentReceiptFile()
-                    .orElseThrow(() -> new IllegalArgumentException("Необходимо предоставить чек оплаты для категории " + publishRequest.getCategory()));
+                    .orElseThrow(() -> new IllegalArgumentException(
+                            "Необходимо выбрать банк для категории " + publishRequest.getCategory()));
+
+            MultipartFile receiptFile = publishRequest.getPaymentReceiptFile()
+                    .orElseThrow(() -> new IllegalArgumentException(
+                            "Необходимо предоставить чек оплаты для категории " + publishRequest.getCategory()));
 
             try {
                 sendReceiptAsDocumentToTelegram(receiptFile, bankName, savedPublish);
