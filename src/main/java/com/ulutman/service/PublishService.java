@@ -66,14 +66,6 @@ public class PublishService {
             throw new IllegalArgumentException("Неверная подкатегория для выбранной категории");
         }
 
-//        List<String> imageUrls = publishRequest.getImages();
-//        log.info("URL изображений: {}", imageUrls);
-//
-//        for (String url : imageUrls) {
-//            if (!url.startsWith("http")) {
-//                throw new IllegalArgumentException("Некорректный URL изображения: " + url);
-//            }
-//        }
         List<String> imageUrls = publishRequest.getImages();
         log.info("URL изображений: {}", imageUrls);
 

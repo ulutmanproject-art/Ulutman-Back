@@ -51,7 +51,7 @@ public class PublishController {
             @RequestParam("address") String address,
             @RequestParam("phoneNumber") String phoneNumber,
             @RequestParam("images") List<MultipartFile> images,
-            @RequestParam("price") double price,
+            @RequestParam("price") String price,
             @RequestParam("category") Category category,
             @RequestParam("subcategory") Subcategory subcategory,
             @RequestParam(value = "bank", required = false) String bank,

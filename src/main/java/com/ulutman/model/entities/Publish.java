@@ -33,7 +33,8 @@ public class Publish {
 
     private String description;
 
-    private double price;
+    @Column(length = 100)
+    private String price;
 
     @Enumerated(EnumType.STRING)
     private Category category;
@@ -48,7 +49,7 @@ public class Publish {
 
     private String address;
 
-    public Publish(Long id, LocalDateTime createdAt, String title, String description, double price, Category category, Subcategory subCategory, Metro metro, String address, String phone, boolean active, String chatId, String paymentReceiptUrl, String bank, List<String> images, LocalDate createDate, PublishStatus publishStatus, boolean detailFavorite, CategoryStatus categoryStatus, LocalDateTime lastBoostedAt, Payment payment, List<Favorite> favorites, User user, PropertyDetails propertyDetails, Conditions conditions) {
+    public Publish(Long id, LocalDateTime createdAt, String title, String description, String price, Category category, Subcategory subCategory, Metro metro, String address, String phone, boolean active, String chatId, String paymentReceiptUrl, String bank, List<String> images, LocalDate createDate, PublishStatus publishStatus, boolean detailFavorite, CategoryStatus categoryStatus, LocalDateTime lastBoostedAt, Payment payment, List<Favorite> favorites, User user, PropertyDetails propertyDetails, Conditions conditions) {
         this.id = id;
         this.createdAt = createdAt;
         this.title = title;

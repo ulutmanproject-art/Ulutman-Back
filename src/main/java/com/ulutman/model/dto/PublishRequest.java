@@ -27,7 +27,7 @@ public class PublishRequest {
 
     List<String> images;
 
-    double price;
+    String price;
 
     Category category;
 

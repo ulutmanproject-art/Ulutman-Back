@@ -31,7 +31,7 @@ public class PublishResponse {
 
     List<String> images;
 
-    double price;
+    String price;
 
     Category category;
 
