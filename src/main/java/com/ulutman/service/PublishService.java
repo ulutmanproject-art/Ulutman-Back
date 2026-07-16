@@ -49,8 +49,12 @@ public class PublishService {
     private final ConditionsMapper conditionsMapper;
     private final MailingService mailingService;
     private final FavoriteRepository favoriteRepository;
-    private static final String ADMIN_CHAT_ID = "7825590787";
-    private static final String TELEGRAM_BOT_TOKEN = "8916468491:AAGZbYzNTZxBaqayYwl5_fYN2wYsa7BAD6s";
+//    private static final String ADMIN_CHAT_ID = "7825590787";
+//    private static final String TELEGRAM_BOT_TOKEN = "8916468491:AAGZbYzNTZxBaqayYwl5_fYN2wYsa7BAD6s";
+
+    private static final String ADMIN_CHAT_ID = "644781402";
+    private static final String TELEGRAM_BOT_TOKEN =   "8904424094:AAHyjcK-pl-Fa0L-Vti8HubShbEBaMK5a6k";
+
     private final MyPublishRepository myPublishRepository;
     private final MinioService minioService;
 
