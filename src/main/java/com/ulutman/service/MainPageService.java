@@ -26,77 +26,245 @@ public class MainPageService {
 
     private final PublishRepository publishRepository;
     private final PublishMapper publishMapper;
+    private final MinioService minioService;
 
     public List<PublishResponse> findPublishByCategoryWork() {
         List<Publish> work = publishRepository.findByCategoryWork();
-        return work.stream().map(publishMapper::mapToResponse).toList();
+        return work.stream()
+                .map(publish -> {
+                    PublishResponse response = publishMapper.mapToResponse(publish);
+
+                    response.setImages(
+                            response.getImages().stream()
+                                    .map(minioService::presign)
+                                    .toList()
+                    );
+
+                    return response;
+                })
+                .toList();
+
     }
 
     public List<PublishResponse> findPublishByCategoryWORK(Subcategory subCategory) {
         List<Publish> work = publishRepository.findBySubCategoryWORK(subCategory);
-        return work.stream().map(publishMapper::mapToResponse).toList();
+        return work.stream()
+                .map(publish -> {
+                    PublishResponse response = publishMapper.mapToResponse(publish);
+
+                    response.setImages(
+                            response.getImages().stream()
+                                    .map(minioService::presign)
+                                    .toList()
+                    );
+
+                    return response;
+                })
+                .toList();
     }
 
     public List<PublishResponse> findPublishByCategoryRent() {
         List<Publish> rent = publishRepository.findByCategoryRent();
-        return rent.stream().map(publishMapper::mapToResponse).toList();
+        return rent.stream()
+                .map(publish -> {
+                    PublishResponse response = publishMapper.mapToResponse(publish);
+
+                    response.setImages(
+                            response.getImages().stream()
+                                    .map(minioService::presign)
+                                    .toList()
+                    );
+
+                    return response;
+                })
+                .toList();
     }
 
     public List<PublishResponse> findPublishByCategoryRent(Subcategory subCategory) {
         List<Publish> rent = publishRepository.findBySubCategoryRent(subCategory);
-        return rent.stream().map(publishMapper::mapToResponse).toList();
+        return rent.stream()
+                .map(publish -> {
+                    PublishResponse response = publishMapper.mapToResponse(publish);
+
+                    response.setImages(
+                            response.getImages().stream()
+                                    .map(minioService::presign)
+                                    .toList()
+                    );
+
+                    return response;
+                })
+                .toList();
     }
 
     public List<PublishResponse> findPublishByCategorySell() {
         List<Publish> sell = publishRepository.findByCategorySell();
-        return sell.stream().map(publishMapper::mapToResponse).toList();
+        return sell.stream()
+                .map(publish -> {
+                    PublishResponse response = publishMapper.mapToResponse(publish);
+
+                    response.setImages(
+                            response.getImages().stream()
+                                    .map(minioService::presign)
+                                    .toList()
+                    );
+
+                    return response;
+                })
+                .toList();
     }
 
     public List<PublishResponse> findPublishByCategorySell(Subcategory subCategory) {
         List<Publish> sell = publishRepository.findBySubCategorySell(subCategory);
-        return sell.stream().map(publishMapper::mapToResponse).toList();
+        return sell.stream()
+                .map(publish -> {
+                    PublishResponse response = publishMapper.mapToResponse(publish);
+
+                    response.setImages(
+                            response.getImages().stream()
+                                    .map(minioService::presign)
+                                    .toList()
+                    );
+
+                    return response;
+                })
+                .toList();
     }
 
     public List<PublishResponse> findPublishByCategoryHotel() {
         List<Publish> hotel = publishRepository.findByCategoryHotel();
-        return hotel.stream().map(publishMapper::mapToResponse).toList();
+        return hotel.stream()
+                .map(publish -> {
+                    PublishResponse response = publishMapper.mapToResponse(publish);
+
+                    response.setImages(
+                            response.getImages().stream()
+                                    .map(minioService::presign)
+                                    .toList()
+                    );
+
+                    return response;
+                })
+                .toList();
     }
 
     public List<PublishResponse> findPublishByCategoryHotel(Subcategory subCategory) {
         List<Publish> hotel = publishRepository.findBySubCategoryHotel(subCategory);
-        return hotel.stream().map(publishMapper::mapToResponse).toList();
+        return hotel.stream()
+                .map(publish -> {
+                    PublishResponse response = publishMapper.mapToResponse(publish);
+
+                    response.setImages(
+                            response.getImages().stream()
+                                    .map(minioService::presign)
+                                    .toList()
+                    );
+
+                    return response;
+                })
+                .toList();
     }
 
     public List<PublishResponse> findPublishByCategoryServices() {
         List<Publish> services = publishRepository.findByCategoryServices();
-        return services.stream().map(publishMapper::mapToResponse).toList();
+        return services.stream()
+                .map(publish -> {
+                    PublishResponse response = publishMapper.mapToResponse(publish);
+
+                    response.setImages(
+                            response.getImages().stream()
+                                    .map(minioService::presign)
+                                    .toList()
+                    );
+
+                    return response;
+                })
+                .toList();
     }
 
     public List<PublishResponse> findPublishByCategoryServices(Subcategory subCategory) {
         List<Publish> services = publishRepository.findBySubCategoryServices(subCategory);
-        return services.stream().map(publishMapper::mapToResponse).toList();
+        return services.stream()
+                .map(publish -> {
+                    PublishResponse response = publishMapper.mapToResponse(publish);
+
+                    response.setImages(
+                            response.getImages().stream()
+                                    .map(minioService::presign)
+                                    .toList()
+                    );
+
+                    return response;
+                })
+                .toList();
     }
 
     public List<PublishResponse> findPublishByCategoryAUTO(Subcategory subCategory) {
         List<Publish> auto = publishRepository.findBySubCategoryAUTO(subCategory);
-        return auto.stream().map(publishMapper::mapToResponse).toList();
+        return auto.stream()
+                .map(publish -> {
+                    PublishResponse response = publishMapper.mapToResponse(publish);
+
+                    response.setImages(
+                            response.getImages().stream()
+                                    .map(minioService::presign)
+                                    .toList()
+                    );
+
+                    return response;
+                })
+                .toList();
     }
 
     public List<PublishResponse> findPublishByCategoryRealEstate() {
         List<Publish> realEstate = publishRepository.findByCategoryRealEstate();
-        return realEstate.stream().map(publishMapper::mapToResponse).toList();
+        return realEstate.stream()
+                .map(publish -> {
+                    PublishResponse response = publishMapper.mapToResponse(publish);
+
+                    response.setImages(
+                            response.getImages().stream()
+                                    .map(minioService::presign)
+                                    .toList()
+                    );
+
+                    return response;
+                })
+                .toList();
     }
 
     public List<PublishResponse> findPublishBySubCategoryREAL_ESTATE(Subcategory subCategory) {
         List<Publish> publishes = publishRepository.findBySubCategoryREAL_ESTATE(subCategory);
-        return publishes.stream().map(publishMapper::mapToResponse).toList();
+        return publishes.stream()
+                .map(publish -> {
+                    PublishResponse response = publishMapper.mapToResponse(publish);
+
+                    response.setImages(
+                            response.getImages().stream()
+                                    .map(minioService::presign)
+                                    .toList()
+                    );
+
+                    return response;
+                })
+                .toList();
     }
 
     public List<PublishResponse> filterPublishesByCategory(List<Category> categories, String sortBy) {
         List<Publish> publishes = publishRepository.filterPublishesByCategory(categories, sortBy);
         return publishes.stream()
-                .map(publishMapper::mapToResponse) // Преобразование Publish в PublishResponse
-                .collect(Collectors.toList());
+                .map(publish -> {
+                    PublishResponse response = publishMapper.mapToResponse(publish);
+
+                    response.setImages(
+                            response.getImages().stream()
+                                    .map(minioService::presign)
+                                    .toList()
+                    );
+
+                    return response;
+                })
+                .toList();
     }
 
     public List<PublishResponse> searchPublishes(List<Category> categories,
@@ -110,7 +278,17 @@ public class MainPageService {
         List<Publish> filteredPublishes = publishRepository.findAll(specification);
 
         return filteredPublishes.stream()
-                .map(publishMapper::mapToResponse)
-                .collect(Collectors.toList());
+                .map(publish -> {
+                    PublishResponse response = publishMapper.mapToResponse(publish);
+
+                    response.setImages(
+                            response.getImages().stream()
+                                    .map(minioService::presign)
+                                    .toList()
+                    );
+
+                    return response;
+                })
+                .toList();
     }
 }
